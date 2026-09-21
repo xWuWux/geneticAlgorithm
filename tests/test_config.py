@@ -8,6 +8,13 @@ def test_default_config_is_valid():
     assert cfg.population > 0
 
 
+def test_default_target_score_is_effectively_unreachable():
+    # synthetic_cost routinely scores in the hundreds/thousands; a low
+    # default (the original default was 1.0) made a default run "succeed"
+    # at generation 0 without ever evolving.
+    assert GAConfig().target_score == float("inf")
+
+
 @pytest.mark.parametrize(
     "overrides",
     [

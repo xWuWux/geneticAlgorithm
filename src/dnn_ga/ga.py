@@ -70,10 +70,16 @@ def evolve(population: List[Individual], cfg: GAConfig, rng: Random) -> List[Ind
     the children (a simple mu+lambda-style scheme), then apply mutation to
     that whole combined set.
     """
+    if len(population) != cfg.population:
+        raise ValueError(
+            f"evolve() expected a population of size {cfg.population} (per cfg), "
+            f"got {len(population)}"
+        )
+
     ranked = sorted(population, key=lambda ind: ind.score, reverse=True)
     elites = [ind.clone() for ind in ranked[: cfg.elitism_count]]
 
-    n_parents = (cfg.population - cfg.elitism_count) // 2
+    n_parents = (len(population) - cfg.elitism_count) // 2
     parents = roulette_select(ranked, n_parents, rng)
     children_genomes = crossover_population([p.genome for p in parents], rng)
     children = [Individual(genome=g) for g in children_genomes]

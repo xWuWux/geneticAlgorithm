@@ -22,7 +22,13 @@ def configure_logging(
     """
     logger = logging.getLogger(_LOGGER_NAME)
     logger.setLevel(level)
-    logger.handlers.clear()
+    # Close handlers (in particular any FileHandler's open file descriptor)
+    # before dropping them - `.clear()` alone would leak them if this is
+    # called more than once in the same process (e.g. driving several runs
+    # with different --log-file paths).
+    for handler in list(logger.handlers):
+        handler.close()
+        logger.removeHandler(handler)
 
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
 

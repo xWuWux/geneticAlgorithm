@@ -1,5 +1,7 @@
 from random import Random
 
+import pytest
+
 from dnn_ga.config import GAConfig
 from dnn_ga.fitness import synthetic_cost
 from dnn_ga.ga import evolve, has_stagnated, run_ga
@@ -38,6 +40,19 @@ def test_evolve_preserves_best_individual_via_elitism():
 
     assert len(next_gen) == cfg.population
     assert any(ind.genome == [7, 7, 7, 7] and ind.score == 10_000.0 for ind in next_gen)
+
+
+def test_evolve_rejects_a_population_whose_length_does_not_match_cfg():
+    """Regression test: evolve() used to derive n_parents from cfg.population
+    instead of len(population), silently assuming the two always match. A
+    caller that passed a population of a different size (e.g. a
+    resumed/trimmed run) would get a silently wrong number of children
+    instead of a clear error."""
+    cfg = GAConfig(population=12, elitism_count=4)
+    mismatched = [Individual(genome=[1, 1], score=1.0) for _ in range(11)]
+
+    with pytest.raises(ValueError):
+        evolve(mismatched, cfg, Random(0))
 
 
 def test_run_ga_returns_the_best_genome_not_just_a_score():

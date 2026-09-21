@@ -20,7 +20,12 @@ class GAConfig:
     max_neurons: int = 128
     population: int = 80
     generations: int = 10
-    target_score: float = 1.0
+    # Effectively unreachable by default: `synthetic_cost` routinely scores
+    # in the hundreds/thousands (layer widths up to max_neurons=128), so a
+    # low default like 1.0 made a demo run "succeed" at generation 0 without
+    # ever evolving. Real fitness functions (e.g. model accuracy, which is
+    # in [0, 1]) should pass an explicit, meaningful target_score.
+    target_score: float = float("inf")
     # Chance, per individual per generation, that a mutation is applied at all.
     mutation_chance: float = 0.05
     # Given that a mutation happens, the chance it changes the *shape* of the

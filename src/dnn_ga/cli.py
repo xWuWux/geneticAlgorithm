@@ -8,6 +8,7 @@ from .config import GAConfig
 from .fitness import load_iris_dataset, make_keras_dnn_cost, synthetic_cost
 from .ga import run_ga
 from .logging_utils import configure_logging, log_generation
+from .presets import DNN_PRESET
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -28,6 +29,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--log-file", type=str, default=None, help="optional path to also write logs to a file")
     parser.add_argument("--population", type=int, default=None)
     parser.add_argument("--generations", type=int, default=None)
+    parser.add_argument("--target-score", type=float, default=None)
     return parser
 
 
@@ -40,18 +42,15 @@ def main(argv: Optional[List[str]] = None) -> int:
         cfg_overrides["population"] = args.population
     if args.generations is not None:
         cfg_overrides["generations"] = args.generations
+    if args.target_score is not None:
+        cfg_overrides["target_score"] = args.target_score
 
     if args.mode == "dnn":
-        cfg = GAConfig(
-            min_layers=4,
-            max_layers=4,
-            max_neurons=6,
-            population=100,
-            generations=30,
-            target_score=0.995,
-            elitism_count=4,
-            **cfg_overrides,
-        )
+        # Merge as a dict, not as separate keyword args: passing the preset
+        # values as explicit kwargs *and* spreading cfg_overrides after them
+        # raised "got multiple values for keyword argument" whenever a CLI
+        # flag (e.g. --population) overrode a key the preset also set.
+        cfg = GAConfig(**{**DNN_PRESET, **cfg_overrides})
         train_x, train_y, test_x, test_y = load_iris_dataset()
         cost_fn = make_keras_dnn_cost(train_x, train_y, test_x, test_y)
     else:
