@@ -2,5 +2,13 @@
 .idea
 # virtual env
 venv
+.venv/
 # python files
 *.pyc
+__pycache__/
+.pytest_cache/
+*.egg-info/
+*:Zone.Identifier
+_work/
+*.log
+.ipynb_checkpoints/

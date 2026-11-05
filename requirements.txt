@@ -1,0 +1,8 @@
+# Core GA (dnn_ga package) has no hard dependencies.
+# Install these to run --mode dnn (real DNN training) or the notebook:
+tensorflow>=2.13
+pandas>=1.5
+numpy>=1.23
+
+# For running the test suite:
+pytest>=7.0

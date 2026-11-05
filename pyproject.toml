@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dnn-ga"
+version = "0.2.0"
+description = "Genetic algorithm search over DNN hidden-layer architectures"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+dnn = ["tensorflow>=2.13", "pandas>=1.5", "numpy>=1.23"]
+test = ["pytest>=7.0"]
+
+[project.scripts]
+dnn-ga = "dnn_ga.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
