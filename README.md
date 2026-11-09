@@ -590,6 +590,7 @@ released. Planned work is tracked in GitHub issues:
 | Area | Issues |
 |---|---|
 | Release cycle (license, versioning, PyPI, signed assets) | #14 and sub-issues #16–#26 |
+| Search quality: does the GA find better networks? | #27 and sub-issues #28–#34 (known-optimum tests, tabular benchmark, baselines, improvement curves, evaluation store, ablations, weekly benchmark) |
 | Test quality | #3 (mutation-testing gaps), #9 (reproducibility) |
 | Error handling | #15 |
 | CI coverage | #4 (minimum dependencies), #5 (no extras), #6 (ruff/mypy), #7 (Python 3.14, Windows/macOS), #8 (README examples), #10 (security scans), #11 (Dependabot), #12 (upstream canary), #13 (timeouts) |
@@ -599,12 +600,12 @@ Issues and PRs carry labels on five axes:
 | Prefix | Values | Meaning |
 |---|---|---|
 | `type:` | `bug`, `feature`, `test`, `ci`, `docs`, `release`, `security`, `chore` | what kind of work it is |
-| `area:` | `engine`, `config`, `operators`, `backends`, `data`, `history`, `cli`, `packaging`, `ci`, `docs`, `tests` | which part of the repo it touches |
+| `area:` | `engine`, `config`, `operators`, `backends`, `data`, `history`, `cli`, `packaging`, `ci`, `docs`, `tests`, `benchmarks` | which part of the repo it touches |
 | `priority:` | `P0` (blocker) … `P3` (nice to have) | order of work |
 | `status:` | `needs decision`, `blocked`, `ready`, `in progress` | whether it can be picked up |
 | `effort:` | `S` (< 1 day), `M` (days), `L` (week+) | rough size |
 
-`epic` marks an umbrella issue tracked through sub-issues (#14);
+`epic` marks an umbrella issue tracked through sub-issues (#14, #27);
 `good first issue` marks small, self-contained tasks.
 
 ## Authors, citation and license
