@@ -590,12 +590,13 @@ mutmut show <mutant-name>               # see one change no test caught
 
 ## Project status and roadmap
 
-`dnnga` 0.2.0 lives on the `dnnga-library` branch (PR #2) and has not been
-released. Planned work is tracked in GitHub issues:
+`dnnga` 0.2.0 is on `master` (merged in #2 and #35) but has not been released to
+PyPI yet: a license (#16) and the release workflow (#14) come first, so install
+it from a checkout for now. Planned work is tracked in GitHub issues:
 
 | Area | Issues |
 |---|---|
-| Release cycle (license, versioning, PyPI, signed assets) | #14 and sub-issues #16–#26 |
+| Release cycle (license, versioning, PyPI, signed assets) | #14 and sub-issues #16, #18–#26 (#17 done) |
 | Search quality: does the GA find better networks? | #27 and sub-issues #28–#34 (known-optimum tests, tabular benchmark, baselines, improvement curves, evaluation store, ablations, weekly benchmark) |
 | Test quality | #3 (mutation-testing gaps), #9 (reproducibility) |
 | Error handling | #15 |
