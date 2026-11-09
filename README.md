@@ -599,6 +599,7 @@ released. Planned work is tracked in GitHub issues:
 | Search quality: does the GA find better networks? | #27 and sub-issues #28–#34 (known-optimum tests, tabular benchmark, baselines, improvement curves, evaluation store, ablations, weekly benchmark) |
 | Test quality | #3 (mutation-testing gaps), #9 (reproducibility) |
 | Error handling | #15 |
+| Opt-in search-quality features (restarts, immigration, adaptive mutation, diversity, islands, Pareto, noise-aware evaluation, early-stopping calibration, top-k retrain) | #36 and sub-issues #37–#45 |
 | CI coverage | #4 (minimum dependencies), #5 (no extras), #6 (ruff/mypy), #7 (Python 3.14, Windows/macOS), #8 (README examples), #10 (security scans), #11 (Dependabot), #12 (upstream canary), #13 (timeouts) |
 
 Issues and PRs carry labels on five axes:
@@ -611,7 +612,7 @@ Issues and PRs carry labels on five axes:
 | `status:` | `needs decision`, `blocked`, `ready`, `in progress` | whether it can be picked up |
 | `effort:` | `S` (< 1 day), `M` (days), `L` (week+) | rough size |
 
-`epic` marks an umbrella issue tracked through sub-issues (#14, #27);
+`epic` marks an umbrella issue tracked through sub-issues (#14, #27, #36);
 `good first issue` marks small, self-contained tasks.
 
 ## Authors, citation and license
