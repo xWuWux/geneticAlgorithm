@@ -53,7 +53,7 @@ with gradient-based optimisation.
 bit-flip mutation, illustrated on 6-bit chromosomes maximising *f(x) = x^(3/2)*),
 the biological and McCulloch–Pitts neuron, the perceptron, activation functions
 (sigmoid, tanh, softmax, softsign, ReLU, ELU), network types (RBF, Kohonen,
-recurrent), and training methods (gradient descent, backpropagation). Chapter 5
+recurrent, convolutional, modular), and training methods (gradient descent, backpropagation). Chapter 5
 describes the GA written for the thesis and its results on the Iris dataset —
 summarised in [The original thesis experiment](#the-original-thesis-experiment).
 
@@ -193,7 +193,9 @@ new architecture: [16] (validation 0.972, held-out test 0.972)
 cost: 9 trainings
 ```
 
-`iris_example.py` — the thesis experiment. Iris is *too easy* to show anything:
+`iris_example.py` — a reduced redo of the thesis experiment (1–4 layers, ≤ 24
+neurons, population 10, 8 generations; the thesis used 4–6 layers, ≤ 8 neurons,
+population 80, 30 generations). Iris is *too easy* to show anything:
 generation 0 already contains a candidate at 1.000 validation accuracy. It does
 show the selection bias, though: the winner scored 1.000 during the search, and
 the same architecture trained properly scores 0.967 on validation and on test.
@@ -217,15 +219,16 @@ python -m dnnga --mode synthetic          # the same entry point
   train/validation/test split: candidates are scored on **validation**, and the
   winner is scored once on **test**, so the printed held-out score was not used
   for selection.
-* `--population` / `--generations` accept any value (the original required a
-  population divisible by 4). `--seed-layers 16,8` starts from a known
+* `--population` / `--generations` have no divisibility rule (the original
+  required a population divisible by 4); the population must be at least 2 and
+  at least `--tournament-size` (3 by default), and generations at least 1. `--seed-layers 16,8` starts from a known
   structure; `--seed` makes the GA, the data split and weight initialisation
   reproducible. Other options map to `EvolutionConfig` fields
   (`--min-layers`, `--max-neurons`, `--epochs-per-candidate`,
   `--final-training-epochs`, `--elitism-count`, `--direction`, …); run
   `dnnga --help` for the full list.
-* Exit code `2` means the input was rejected before any compute was spent; the
-  reason is printed on stderr.
+* Exit code `2` means the input was rejected before any compute was spent;
+  exit code `1` means the search itself failed. The reason is printed on stderr.
 
 ## Software variables
 
@@ -258,7 +261,7 @@ python -m dnnga --mode synthetic          # the same entry point
 |---|---|---|---|---|
 | `min_layers` / `max_layers` | `int` | 1 / 6 | `MIN_LAYER` / `MAX_LAYER` | depth range |
 | `min_neurons` / `max_neurons` | `int` | 1 / 64 | (fixed 1) / `MAX_NEURONS` | width range, every layer |
-| `population_size` | `int` | 20 | `POPULATION` | any integer ≥ 2 |
+| `population_size` | `int` | 20 | `POPULATION` | integer ≥ 2 and ≥ `tournament_size`; no divisibility rule |
 | `n_generations` | `int` | 20 | `GENERATIONS` | hard cap on generations |
 | `epochs_per_candidate` | `int` | 20 | `STEPS`* | training epochs per candidate |
 | `final_training_epochs` | `int \| None` | `None` | — | retrain the winner from scratch with this budget |
@@ -341,8 +344,11 @@ variable but not its value; the notebook hard-codes 5000 training steps.
 
 **Data.** Iris: 150 samples (50 each of *Iris setosa*, *versicolor*,
 *virginica*), 4 features (sepal and petal length and width), 3 classes. The
-notebook uses TensorFlow's Iris CSVs; every reported accuracy is a multiple of
-1/30, consistent with the 30-row `iris_test.csv` (120 rows for training).
+notebook downloads TensorFlow's Iris CSVs: `iris_training.csv` (120 rows) and
+`iris_test.csv` (30 rows). The thesis does not state the split, but every
+per-candidate accuracy it reports (Figs. 26–27, the best scores in Table 3) is a
+multiple of 1/30, consistent with that test file; the Table 3 means are
+averages and need not be.
 
 ### Results reported in the thesis (§5.3)
 
@@ -390,8 +396,8 @@ From [`docs/CODE_REVIEW.md` §3](docs/CODE_REVIEW.md#3-method-what-the-iris-expe
   best is the maximum over many candidates on the rows it is reported on —
   optimistically biased. `dnnga` selects on a validation split and scores the
   test split once, on the winner only.
-* **Resolution.** One test row = 3.3 percentage points; `TARGET_SCORE = 0.995`
-  is reachable only by 30/30.
+* **Resolution** (inferred from the 30-row test file above). One test row =
+  3.3 percentage points; `TARGET_SCORE = 0.995` is reachable only by 30/30.
 * **Noise ≥ signal.** Run-to-run variance of one architecture (23–97 %) is far
   larger than the differences between architectures.
 * **No baseline.** No comparison with a hand-picked network or with random
@@ -411,7 +417,7 @@ original code, with reproductions. Summary, and where `dnnga` handles each:
 | 1.1 | Roulette appends the *same list object* several times; in-place mutation then corrupts other individuals' genomes while they keep their old fitness (~10 of 76 slots aliased per generation) | Bug (measured) | Immutable `Architecture`; operators return new objects |
 | 1.2 | The notebook's last line is a syntax error, so it cannot run as shipped | Bug | Library + runnable `examples/` |
 | 1.3 | Importing the module prints "Please correct POPULATION or MIN_LAYER" | Minor | No import-time side effects |
-| 1.4 | Population must be divisible by 4, and `POPULATION = 4` still crashes (the summary reads 5 individuals) | Bug | Any `population_size ≥ 2` |
+| 1.4 | Population must be divisible by 4, and `POPULATION = 4` still crashes (the summary reads 5 individuals) | Bug | Any `population_size ≥ 2` (and ≥ `tournament_size`); no divisibility rule |
 | 1.5 | Roulette edge cases: all-zero fitness divides by zero, negative fitness gives invalid probabilities | Minor | `random.choices` with shifting; clear error if all failed |
 | 1.6 | Mutation wraps around at the edges, so a ±1 nudge jumps across the whole range (128 → 1) | Design | `clamp` by default, `wrap` optional |
 | 1.7 | Dead code (unused `sort()`, noise arrays never applied, an unrunnable TF1 TensorBoard cell) | Minor | Not carried over |
@@ -538,14 +544,14 @@ class TorchMLPBackend(ModelBackend):
 ├── docs/
 │   ├── CODE_REVIEW.md          review of the original code and experiment
 │   └── *.pdf                   the thesis (Polish)
-├── reference/original_fork/    unmodified original files, kept for provenance
+├── reference/original_fork/    original files (and one patched copy), kept for provenance
 ├── geneticAlgorithm.py         original 2021 GA script (toy cost function)
 ├── Genetic_algorithm_for_DNN.ipynb   original 2021 Colab notebook (Iris, TensorFlow)
 └── .github/workflows/          ci.yml (tests, Keras, wheel), mutation.yml (weekly mutmut)
 ```
 
-**Provenance.** `reference/original_fork/` holds unmodified copies of the
-original code: `geneticAlgorithm_fork.py`, the fork's notebook
+**Provenance.** `reference/original_fork/` holds copies of the original code:
+unmodified `geneticAlgorithm_fork.py` and the fork's notebook
 (`Genetic_algorithm_for_DNN_fork_original.ipynb`, whose last line is a syntax
 error) and a separately patched copy (`Genetic_algorithm_for_DNN_wojtek_copy.ipynb`:
 syntax fix, file logging, a `STEPS` variable). Nothing in `src/` or `tests/`
