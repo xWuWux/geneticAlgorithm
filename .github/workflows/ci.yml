@@ -45,6 +45,25 @@ jobs:
           python examples/iris_example.py
           python examples/target_accuracy_example.py
 
+  lint:
+    name: lint (ruff)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install ruff
+        run: python -m pip install --upgrade pip "ruff>=0.6"
+
+      - name: Run ruff
+        run: ruff check src tests
+
   keras:
     name: tests (Python 3.12, Keras/TensorFlow)
     runs-on: ubuntu-24.04
@@ -115,3 +134,30 @@ jobs:
           name: distributions
           path: dist/*
           if-no-files-found: error
+
+  package-smoke:
+    name: package smoke (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Build the wheel and install it
+        run: |
+          python -m pip install --upgrade pip build pytest "scikit-learn>=1.1"
+          python -m build --wheel
+          python -m pip install --no-index --find-links dist --no-deps "dnnga[sklearn]"
+
+      - name: Run installed-package smoke tests
+        run: python -m pytest tests/smoke/package_smoke.py -q --disable-warnings

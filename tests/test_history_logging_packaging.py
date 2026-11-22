@@ -123,5 +123,6 @@ class TestOptionalDependencies:
     def test_unknown_backend_attribute_raises_attribute_error(self):
         import dnnga.backends as b
 
+        name = "DoesNotExist"
         with pytest.raises(AttributeError):
-            b.DoesNotExist
+            getattr(b, name)

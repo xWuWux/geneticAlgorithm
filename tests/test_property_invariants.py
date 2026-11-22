@@ -13,7 +13,13 @@ import random
 import numpy as np
 import pytest
 
-from dnnga import Architecture, EvaluationError, EvolutionConfig, GeneticArchitectureSearch, TrainingData
+from dnnga import (
+    Architecture,
+    EvaluationError,
+    EvolutionConfig,
+    GeneticArchitectureSearch,
+    TrainingData,
+)
 from tests.conftest import FakeBackend, FakeModel
 
 DATA = TrainingData(np.zeros((6, 2)), [0, 1] * 3, np.zeros((4, 2)), [0, 1] * 2,

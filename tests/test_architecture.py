@@ -1,4 +1,5 @@
 import random
+from dataclasses import FrozenInstanceError
 
 import numpy as np
 import pytest
@@ -43,7 +44,7 @@ class TestValidation:
 class TestImmutability:
     def test_frozen(self):
         a = Architecture((4, 8))
-        with pytest.raises(Exception):
+        with pytest.raises(FrozenInstanceError):
             a.layer_sizes = (1,)  # type: ignore[misc]
 
     def test_hashable_and_equal_by_value(self):
