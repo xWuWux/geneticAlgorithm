@@ -297,7 +297,7 @@ def test_editable_install_uninstall(tmp_path):
 
 
 def test_hash_pinned_install(tmp_path):
-    """--require-hashes install of the wheel from a pinned requirements file."""
+    """--require-hashes rejects a tampered wheel and accepts the pinned original."""
     python, bin_dir = _make_venv(tmp_path)
     wheel = _wheel()
     _install_deps(python)
@@ -313,6 +313,35 @@ def test_hash_pinned_install(tmp_path):
     requirements.write_text(
         f"dnnga=={_wheel_version(wheel)} {hash_line}\n", encoding="utf-8"
     )
+
+    # A byte-modified copy must be rejected by --require-hashes. This checks
+    # hash enforcement, not a tautological re-hash of the same artifact.
+    tampered_dir = tmp_path / "tampered"
+    tampered_dir.mkdir()
+    tampered = tampered_dir / wheel.name
+    tampered.write_bytes(wheel.read_bytes() + b"\n# tampered\n")
+    rejected = subprocess.run(
+        [
+            str(python),
+            "-m",
+            "pip",
+            "install",
+            "--no-index",
+            "--find-links",
+            str(tampered_dir),
+            "--no-deps",
+            "--require-hashes",
+            "-r",
+            str(requirements),
+        ],
+        capture_output=True,
+        text=True,
+        env=PIP_ENV,
+        timeout=INSTALL_TIMEOUT,
+    )
+    assert rejected.returncode != 0, "tampered wheel was accepted"
+    combined = (rejected.stdout + rejected.stderr).lower()
+    assert "hash" in combined or "do not match" in combined, combined
 
     _pip(
         python,

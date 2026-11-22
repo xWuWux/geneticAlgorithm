@@ -158,7 +158,7 @@ jobs:
       - name: Run lifecycle tests (install -> smoke -> uninstall)
         env:
           DNNGA_WHEEL_DIR: dist
-        run: python -m pytest tests/lifecycle/package_lifecycle.py -q --disable-warnings
+        run: python -m pytest tests/lifecycle/package_lifecycle.py -q --disable-warnings --confcutdir=tests/lifecycle
 
   package-lifecycle-keras:
     name: package lifecycle (Keras extra, Linux 3.12)
@@ -185,7 +185,7 @@ jobs:
         env:
           DNNGA_WHEEL_DIR: dist
           DNNGA_TEST_KERAS: "1"
-        run: python -m pytest tests/lifecycle/package_lifecycle.py -q --disable-warnings -k keras
+        run: python -m pytest tests/lifecycle/package_lifecycle.py -q --disable-warnings --confcutdir=tests/lifecycle -k keras
 
   package-lifecycle-index:
     name: published-package lifecycle (TestPyPI -> PyPI)
@@ -211,4 +211,4 @@ jobs:
           DNNGA_INDEX_URL: ${{ inputs.index_url }}
           DNNGA_PREVIOUS_VERSION: ${{ inputs.previous_version }}
           DNNGA_VERSION: ${{ inputs.candidate_version }}
-        run: python -m pytest tests/lifecycle/package_lifecycle.py -q --disable-warnings -k published_upgrade
+        run: python -m pytest tests/lifecycle/package_lifecycle.py -q --disable-warnings --confcutdir=tests/lifecycle -k published_upgrade
