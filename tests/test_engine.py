@@ -558,7 +558,8 @@ class TestLoggingAndHistory:
         assert any("Evaluated" in r.getMessage() for r in caplog.records)
 
     def test_history_json_and_csv_exports(self, tiny_data, tmp_path):
-        import csv, json
+        import csv
+        import json
 
         res, _ = run(make_cfg(n_generations=4), data=tiny_data)
         data = json.loads(res.history.to_json(str(tmp_path / "h.json")))
